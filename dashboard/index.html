@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Dashboard</title>
+        <link rel="stylesheet" href="../asset/fontawesome/css/all.min.css" />
+        <link rel="stylesheet" href="../asset/bootstrap/css/bootstrap.css" />
+        <link rel="stylesheet" href="../asset/sidebar.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+        <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
+        <style>
+        /* Mengatur jarak konten agar berada tepat di bawah header */
+        body {
+            padding-top: 90px; /* Sesuaikan dengan tinggi header Anda */
+        }
+        #wrapper {
+            min-height: calc(100vh - 90px);
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Header Fixed Navigation -->
+    <header style="background-color: orange; z-index: 1030; height: 90px;" 
+            class="fw-semibold fixed-top d-flex align-items-center justify-content-between px-3 shadow-sm">
+        <i id="menu-btn" class="fas fa-bars d-lg-none text-white mr-3"></i>
+        <div class="d-flex align-items-center position-relative">
+            <img src="../asset/img/tpmfix1.png" alt="Logo" style="height: 60px; margin-right: 12px;">
+            <div style="line-height: 1.2;">
+                <div class="header-title" style="font-family: 'Oswald', sans-serif; color:white; font-weight: bold; font-size: 1.25rem;">
+                    TERAS PUTRO MAPAN
+                </div>
+                <div class="header-subtitle" style="font-family: 'Gill Sans', sans-serif; color: white; font-size: 0.85rem;">
+                    Sekebrok RT 01/08, Kel. Beji, Kec. Ungaran Timur, Kab. Semarang
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Wrapper -->
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar Navigation -->
+        <div class="bg-white border-right" id="sidebar-wrapper" style="min-width: 240px;">
+            <div class="p-3 bg-primary text-white d-flex align-items-center justify-content-between">
+                <button class="btn btn-link text-white p-0" id="menu-toggle">
+                    <i class="fas fa-bars fa-lg"></i>
+                </button>
+            </div>
+
+            <div class="list-group list-group-flush py-2">
+                <div class="px-3 py-2 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
+                    ADMIN DASHBOARD
+                </div>
+                <a href="#" class="list-group-item list-group-item-action border-0 active rounded-right my-1">
+                    <i class="fas fa-th-large mr-3"></i> Dashboard
+                </a>
+                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
+                    <i class="fas fa-chart-line mr-3"></i> Stok Barang
+                </a>
+                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
+                    <i class="fas fa-user-plus mr-3"></i> Penjualan Harian
+                </a>
+                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
+                    <i class="fas fa-chart-pie mr-3"></i> Produk Terlaris
+                </a>
+                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-cubes mr-3"></i> Rekap Aktivitas</span>
+                    <i class="fas fa-chevron-down small"></i>
+                </a>
+
+                <div class="px-3 py-2 mt-3 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
+                    Kasir
+                </div>
+                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
+                    <i class="fas fa-list-alt mr-3"></i> Tes
+                </a>
+                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
+                    <i class="fas fa-globe mr-3"></i> Tes
+                </a>
+            </div>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper" class="w-100">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-2">
+                <div class="form-inline my-2 my-lg-0">
+                    <div class="input-group input-group-sm bg-light rounded-pill border px-2 py-1">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-transparent border-0 text-muted">
+                                <i class="fas fa-search"></i>
+                            </span>
+                        </div>
+                        <input type="text" class="form-control bg-transparent border-0 shadow-none" placeholder="Cari" aria-label="Search">
+                    </div>  
+                </div>
+            </nav>
+
+            <div class="container-fluid p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="font-weight-bold text-dark m-0" style="font-family: 'Oswald', sans-serif;">Dashboard</h4>
+                    <button class="btn btn-primary btn-sm px-3 shadow-sm">
+                        <i class="fas fa-plus mr-1"></i> Action
+                    </button>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-lg-5 mb-3 mb-lg-0">
+                        <div class="card border-0 shadow-sm h-100 rounded-lg">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="font-weight-bold mb-3 text-dark">Stok Barang</h6>
+                                    <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
+                                </div>
+                                    
+                                    <!-- Alert List Item Placeholders -->
+                                    <div class="alert alert-danger d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                            <span class="small font-weight-bold">Low Stock Alerts</span>
+                                        </div>
+                                        <span class="badge badge-danger badge-pill"></span>
+                                    </div>
+
+                                    <div class="alert alert-warning d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                            <span class="small font-weight-bold">Low Stock Processes</span>
+                                        </div>
+                                        <span class="badge badge-warning badge-pill text-white"></span>
+                                    </div>
+
+                                    <div class="alert alert-warning d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                            <span class="small font-weight-bold">Low Stock Alerts</span>
+                                        </div>
+                                        <span class="badge badge-warning badge-pill text-white"></span>
+                                    </div>
+
+                                    <div class="alert alert-danger d-flex justify-content-between align-items-center border-0 mb-0 py-2 px-3 rounded">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                                            <span class="small font-weight-bold">Lower Stock Alerts</span>
+                                        </div>
+                                        <span class="badge badge-danger badge-pill"></span>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7">
+                          <div class="card border-0 shadow-sm h-100 rounded-lg">
+                              <div class="card-body d-flex flex-column">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                  <h6 class="font-weight-bold mb-3 text-dark">Penjualan Harian</h6>
+                                  <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
+                                </div>
+                                  <!-- Container Kosong untuk Chart / Grafik -->
+                                  <div class="flex-grow-1 w-100 d-flex align-items-center justify-content-center bg-light rounded" style="min-height: 200px;">
+                                      <!-- Tempat Rendering Line Chart -->
+                                  </div>
+                              </div>
+                          </div>
+                    </div>
+                </div>
+
+              <div class="row">
+                        <!-- Left: Top Selling Products Grid -->
+                        <div class="col-lg-6 mb-3 mb-lg-0">
+                            <div class="card border-0 shadow-sm h-100 rounded-lg">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="font-weight-bold m-0 text-dark">Produk Terlaris</h6>
+                                        <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
+                                    </div>
+
+                                    <!-- Grid Produk Produk Kosong (Placeholder) -->
+                                    <div class="row">
+                                        <!-- Item 1 -->
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light rounded mr-3" style="width: 50px; height: 50px;"></div>
+                                                <div>
+                                                    <div class="small font-weight-bold text-dark"><!-- Nama Produk --></div>
+                                                    <div class="small text-muted"><!-- Harga --></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Item 2 -->
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light rounded mr-3" style="width: 50px; height: 50px;"></div>
+                                                <div>
+                                                    <div class="small font-weight-bold text-dark"></div>
+                                                    <div class="small text-muted"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Item 3 -->
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light rounded mr-3" style="width: 50px; height: 50px;"></div>
+                                                <div>
+                                                    <div class="small font-weight-bold text-dark"></div>
+                                                    <div class="small text-muted"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Item 4 -->
+                                        <div class="col-md-6 mb-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-light rounded mr-3" style="width: 50px; height: 50px;"></div>
+                                                <div>
+                                                    <div class="small font-weight-bold text-dark"></div>
+                                                    <div class="small text-muted"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Recent Activity Feed List -->
+                        <div class="col-lg-6">
+                            <div class="card border-0 shadow-sm h-100 rounded-lg">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h6 class="font-weight-bold m-0 text-dark">Aktivitas Terkini</h6>
+                                        <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
+                                    </div>
+
+                                    <!-- Activity List Item Placeholders -->
+                                    <div class="list-group list-group-flush border-0">
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                                            <div class="d-flex align-items-center">
+                                                <div class="rounded-circle bg-light mr-3" style="width: 36px; height: 36px;"></div>
+                                                <div>
+                                                    <div class="small font-weight-bold text-dark">Recent Activity Feed</div>
+                                                    <div class="text-muted" style="font-size: 11px;"><!-- Keterangan aktivitas --></div>
+                                                </div>
+                                            </div>
+                                            <span class="text-muted small"><!-- Waktu / Jam --></span>
+                                        </div>
+
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                                            <div class="d-flex align-items-center">
+                                                <div class="rounded-circle bg-light mr-3" style="width: 36px; height: 36px;"></div>
+                                                <div>
+                                                    <div class="small font-weight-bold text-dark">Recent Activity Feed</div>
+                                                    <div class="text-muted" style="font-size: 11px;"></div>
+                                                </div>
+                                            </div>
+                                            <span class="text-muted small"></span>
+                                        </div>
+
+                                        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                                            <div class="d-flex align-items-center">
+                                                <div class="rounded-circle bg-light mr-3" style="width: 36px; height: 36px;"></div>
+                                                <div>
+                                                    <div class="small font-weight-bold text-dark">Recent Activity Feed</div>
+                                                    <div class="text-muted" style="font-size: 11px;"></div>
+                                                </div>
+                                            </div>
+                                            <span class="text-muted small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $("#menu-toggle").click(function(e) {
+            e.preventDefault();
+            $("#wrapper").toggleClass("toggled");
+        });
+    </script>
+</body>
+</html>
