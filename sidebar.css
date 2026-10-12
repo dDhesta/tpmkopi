@@ -1,0 +1,72 @@
+ /* Jarak konten agar tepat di bawah header (tinggi header = 90px) */
+        body {
+            padding-top: 90px;
+        }
+
+        #wrapper {
+            min-height: calc(100vh - 90px);
+            overflow-x: hidden;
+        }
+
+        /* ===== SIDEBAR ===== */
+        #sidebar-wrapper {
+            width: 240px;
+            min-width: 240px;
+            flex-shrink: 0;
+            transition: margin-left .3s ease, transform .3s ease;
+        }
+
+        #page-content-wrapper {
+            min-width: 0; /* agar konten tidak melebar melebihi layar */
+            flex: 1;
+        }
+
+        #sidebar-overlay {
+            display: none;
+        }
+
+        /* Desktop (>= 992px): sidebar bisa disembunyikan/ditampilkan */
+        @media (min-width: 992px) {
+            body.sidebar-collapsed #sidebar-wrapper {
+                margin-left: -240px;
+            }
+        }
+
+        /* Mobile / tablet (< 992px): sidebar jadi menu geser (off-canvas) */
+        @media (max-width: 991.98px) {
+            #sidebar-wrapper {
+                position: fixed;
+                top: 90px;
+                left: 0;
+                bottom: 0;
+                height: calc(100vh - 90px);
+                overflow-y: auto;
+                z-index: 1040;
+                transform: translateX(-100%);
+                box-shadow: 4px 0 12px rgba(0, 0, 0, .15);
+            }
+
+            body.sidebar-open #sidebar-wrapper {
+                transform: translateX(0);
+            }
+
+            /* Lapisan gelap di belakang sidebar */
+            #sidebar-overlay {
+                position: fixed;
+                top: 90px;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, .45);
+                z-index: 1035;
+            }
+
+            body.sidebar-open #sidebar-overlay {
+                display: block;
+            }
+
+            /* Cegah halaman ikut ter-scroll saat sidebar terbuka */
+            body.sidebar-open {
+                overflow: hidden;
+            }
+        }
