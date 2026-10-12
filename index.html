@@ -1,309 +1,262 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dashboard</title>
-    <!-- Bootstrap 4.6.2 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" />
-    <link rel="stylesheet" href="sidebar.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body class="bg-light">
+<title>Dashboard Teras Putro Mapan</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&family=Public+Sans:wght@400;600;700&display=swap">
+<style>
+/* Layout: fixed blue header, left sidebar, 12-col card grid (stok 5 / penjualan 7, produk 6 / rekap 6) */
+:root{
+  --bg:#f4f6f9; --surface:#ffffff; --surface-2:#f1f4f8; --line:#e3e8ef;
+  --fg:#1f2933; --muted:#697586; --brand:#007bff; --brand-ink:#ffffff; --brand-soft:#e6f1ff;
+  --bad-bg:#f8d7da; --bad-fg:#721c24; --warn-bg:#fff0c7; --warn-fg:#7a5a00;
+  --chart-line:#007bff; --chart-fill:rgba(0,123,255,.14); --chart-grid:#e3e8ef;
+  --font-display:'Oswald','Arial Narrow',sans-serif; --font-body:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f141b; --surface:#18202a; --surface-2:#202a36; --line:#2b3644;
+  --fg:#e8edf3; --muted:#9aa7b6; --brand:#3b9bff; --brand-soft:#16293f;
+  --bad-bg:#4a2328; --bad-fg:#ffb3ba; --warn-bg:#46391a; --warn-fg:#ffd978;
+  --chart-line:#4aa3ff; --chart-fill:rgba(74,163,255,.18); --chart-grid:#2b3644; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f141b; --surface:#18202a; --surface-2:#202a36; --line:#2b3644;
+  --fg:#e8edf3; --muted:#9aa7b6; --brand:#3b9bff; --brand-soft:#16293f;
+  --bad-bg:#4a2328; --bad-fg:#ffb3ba; --warn-bg:#46391a; --warn-fg:#ffd978;
+  --chart-line:#4aa3ff; --chart-fill:rgba(74,163,255,.18); --chart-grid:#2b3644; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:14px;line-height:1.45}
+svg.i{width:1.1em;height:1.1em;fill:currentColor;flex:none}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 
-    <header style="background-color: #007bff; z-index: 1030; height: 90px;"
-            class="fw-semibold fixed-top d-flex align-items-center px-3 shadow-sm">
-        <button id="menu-btn" type="button" class="btn btn-link text-white p-0 mr-3 d-lg-none" aria-label="Buka menu">
-            <i class="fas fa-bars fa-lg"></i>
-        </button>
-        <div class="d-flex align-items-center position-relative">
-            <img src="tpmfinal1.png" href="index.html" alt="Logo" style="height: 75px; margin-right: 12px;">
-            <div style="line-height: 1.2;">
-                <div class="header-title" style="font-family: 'Oswald', sans-serif; color:white; font-weight: bold; font-size: 1.25rem;">
-                    TERAS PUTRO MAPAN
-                </div>
-                <div class="header-subtitle" style="font-family: 'Gill Sans', sans-serif; color: white; font-size: 0.85rem;">
-                    Sekebrok RT 01/08, Kel. Beji, Kec. Ungaran Timur, Kab. Semarang
-                </div>
-            </div>
-        </div>
-    </header>
+header.top{position:fixed;inset:0 0 auto 0;height:calc(90px + env(safe-area-inset-top,0px));padding:env(safe-area-inset-top,0px) 16px 0;z-index:30;
+  background:#007bff;color:#fff;display:flex;align-items:center;gap:12px;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+header.top img{height:75px;width:75px;flex:none}
+.brand-name{font-family:var(--font-display);font-size:1.25rem;line-height:1.15;letter-spacing:.01em}
+.brand-addr{font-size:.85rem;line-height:1.25}
+#menu-btn{display:none;background:none;border:0;color:#fff;padding:6px;cursor:pointer}
+#menu-btn svg{width:22px;height:22px}
 
-    <!-- Overlay (klik untuk menutup sidebar di HP) -->
-    <div id="sidebar-overlay"></div>
+.shell{padding-top:calc(90px + env(safe-area-inset-top,0px))}
+aside{position:fixed;top:calc(90px + env(safe-area-inset-top,0px));bottom:0;left:0;width:240px;background:var(--surface);border-right:1px solid var(--line);overflow-y:auto;z-index:20;padding:8px 0}
+.nav-h{padding:10px 16px 6px;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.nav a{display:flex;align-items:center;gap:16px;margin:4px 0;padding:12px 16px;color:var(--muted);font-size:1rem}
+.nav a:hover{background:var(--surface-2);text-decoration:none}
+.nav a.active{background:var(--brand);color:#fff;border-radius:0 6px 6px 0}
+.nav svg{width:18px;height:18px}
+main{margin-left:240px;min-width:0}
+.searchbar{background:var(--surface);border-bottom:1px solid var(--line);padding:12px 24px}
+.search{display:flex;align-items:center;gap:10px;width:min(100%,220px);background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:6px 14px;color:var(--muted)}
+.search input{flex:1;min-width:0;background:none;border:0;color:var(--fg);font:inherit;outline:0}
+.content{padding:24px}
+.page-h{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+h1{font-family:var(--font-display);font-size:1.5rem;margin:0}
+.btn{display:inline-flex;align-items:center;gap:6px;background:var(--brand);color:#fff;border:0;border-radius:4px;padding:7px 16px;font:inherit;font-size:.9rem;cursor:pointer}
+.demo{font-size:.8rem;color:var(--muted)}
 
-    <!-- Main Wrapper -->
-    <div class="d-flex" id="wrapper">
-        <!-- Sidebar Navigation -->
-        <div class="bg-white border-right" id="sidebar-wrapper">
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:24px}
+.card{background:var(--surface);border-radius:8px;box-shadow:0 1px 4px rgba(15,23,42,.1);padding:20px;min-width:0;display:flex;flex-direction:column}
+.c5{grid-column:span 5}.c7{grid-column:span 7}.c6{grid-column:span 6}
+.card-h{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+.card-h h2{font-size:1rem;font-weight:700;margin:0}
+.card-h a{font-size:.85rem;font-weight:700}
 
-            <div class="list-group list-group-flush py-2">
-            <div class="px-3 py-2 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
-                    Admin
-            </div>
-                <a href="#" class="list-group-item list-group-item-action border-0 active rounded-right my-1">
-                    <i class="fas fa-th-large mr-3"></i> Dashboard
-                </a>
-                <a href="stokbarang.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-cubes mr-3"></i> Stok Barang
-                </a>
-                <a href="penjualanharian.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-chart-line mr-3"></i> Penjualan Harian
-                </a>
-                <a href="produkterlaris.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-fire mr-3"></i> Produk Terlaris
-                </a>
-                <a href="rekapbelanja.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-receipt mr-3"></i> Rekap Belanja
-                </a>
+.alert{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 14px;border-radius:6px;margin-bottom:8px;font-size:.88rem;font-weight:700}
+.alert:last-child{margin-bottom:0}
+.alert span:first-child{display:flex;align-items:center;gap:8px}
+.alert.bad{background:var(--bad-bg);color:var(--bad-fg)}
+.alert.warn{background:var(--warn-bg);color:var(--warn-fg)}
+.alert b{font-variant-numeric:tabular-nums;min-width:26px;text-align:center;padding:1px 9px;border-radius:999px;background:currentColor}
+.alert b i{font-style:normal;color:var(--surface)}
 
-                <div class="px-3 py-2 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
-                    Operasional
-                </div>
-                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-list-alt mr-3"></i> Kasir
-                </a>
-                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-globe mr-3"></i> Tes
-                </a>
-            </div>
-        </div>
+.kpis{display:flex;gap:28px;flex-wrap:wrap;margin-bottom:12px}
+.kpi small{display:block;color:var(--muted);font-size:.75rem}
+.kpi strong{font-size:1.15rem;font-variant-numeric:tabular-nums}
+.chart-wrap{position:relative;flex:1;min-height:220px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{background:none;border:0;color:var(--muted);font:inherit;font-size:.8rem;padding:4px 10px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--brand-soft);color:var(--brand);font-weight:700}
 
-        <!-- Page Content -->
-        <div id="page-content-wrapper">
-            <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom px-4 py-2">
-                <div class="form-inline my-2 my-lg-0">
-                    <div class="input-group input-group-sm bg-light rounded-pill border px-2 py-1">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text bg-transparent border-0 text-muted">
-                                <i class="fas fa-search"></i>
-                            </span>
-                        </div>
-                        <input type="text" class="form-control bg-transparent border-0 shadow-none" placeholder="Cari" aria-label="Search">
-                    </div>
-                </div>
-            </nav>
+.prods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.prod{display:flex;align-items:center;gap:12px;min-width:0}
+.thumb{width:50px;height:50px;border-radius:6px;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;flex:none;font-weight:700;font-size:.8rem}
+.thumb svg{width:22px;height:22px}
+.pn{font-weight:700;font-size:.88rem;overflow-wrap:anywhere}
+.pm{color:var(--muted);font-size:.8rem;font-variant-numeric:tabular-nums}
+.reroll{background:none;border:1px solid var(--line);color:var(--muted);border-radius:6px;font:inherit;font-size:.8rem;padding:3px 10px;cursor:pointer}
 
-            <div class="container-fluid p-3 p-md-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="font-weight-bold text-dark m-0" style="font-family: 'Oswald', sans-serif;">Dashboard</h4>
-                    <button class="btn btn-primary btn-sm px-3 shadow-sm">
-                        <i class="fas fa-plus mr-1"></i> Action
-                    </button>
-                </div>
+.rek{display:flex;align-items:center;gap:12px;padding:8px 0;min-width:0}
+.rek+.rek{border-top:1px solid var(--line)}
+.rek .circ{width:36px;height:36px;border-radius:50%;background:var(--brand-soft);color:var(--brand);display:grid;place-items:center;flex:none}
+.rek .tx{flex:1;min-width:0}
+.rek .tx div:last-child{color:var(--muted);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rek .amt{font-weight:700;font-size:.85rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+#overlay{display:none}
 
-                <div class="row mb-4">
-                    <div class="col-lg-5 mb-3 mb-lg-0">
-                        <div class="card border-0 shadow-sm h-100 rounded-lg">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="font-weight-bold mb-3 text-dark">Stok Barang</h6>
-                                    <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
-                                </div>
+@media (max-width:991px){
+  #menu-btn{display:block}
+  aside{transform:translateX(-100%);transition:transform .2s}
+  main{margin-left:0}
+  body.open aside{transform:none}
+  body.open #overlay{display:block;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:15}
+  .c5,.c7,.c6{grid-column:1/-1}
+  .content{padding:16px}.searchbar{padding:12px 16px}
+}
+@media (max-width:520px){
+  .brand-addr{font-size:.7rem}.brand-name{font-size:1.05rem}
+  header.top img{height:56px;width:56px}
+  .prods{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){aside{transition:none}}
+</style>
 
-                                <div class="alert alert-danger d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                                        <span class="small font-weight-bold">Low Stock Alerts</span>
-                                    </div>
-                                    <span class="badge badge-danger badge-pill"></span>
-                                </div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-grid" viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8zM5 5v4h4V5zm10 0v4h4V5zM5 15v4h4v-4zm10 0v4h4v-4z"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M12 2 3 6.5v9L12 20l9-4.5v-9zm0 2.2 5.8 2.8L12 9.8 6.2 7zM5 8.6l6 3v6.2l-6-3zm14 0v6.2l-6 3v-6.2z"/></symbol>
+  <symbol id="i-line" viewBox="0 0 24 24"><path d="M3 3h2v16h16v2H3zm4 11 4-5 3 3 5-7 1.6 1.2-6.2 8.6-3-3-3.4 4.4z"/></symbol>
+  <symbol id="i-fire" viewBox="0 0 24 24"><path d="M13 2s1 4-2 7c-2 2-4 4-4 8a6 6 0 0 0 12 0c0-3-1.500-5-3-6.500.2 2-.8 3-2 3 1-3 .5-8-1-11.500z"/></symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2zm3 5v2h6V7zm0 4v2h6v-2zm0 4v2h4v-2z"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M3 5h18v14H3zm3 3v2h3V8zm5 0v2h7V8zm-5 4v2h3v-2zm5 0v2h7v-2z"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1 2.100V7L8 8 6.500 6.500A8 8 0 0 1 11 4.100zM4.300 10 7 11l2 3v3l-2 .5A8 8 0 0 1 4.300 10zM14 19.600V16l2-2 3.500-.5A8 8 0 0 1 14 19.600z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="M10 3a7 7 0 0 1 5.600 11.200l5.100 5.100-1.400 1.400-5.100-5.100A7 7 0 1 1 10 3zm0 2a5 5 0 1 0 0 10 5 5 0 0 0 0-10z"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M11 4h2v7h7v2h-7v7h-2v-7H4v-2h7z"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 2 1 21h22zm-1 7h2v6h-2zm0 8h2v2h-2z"/></symbol>
+  <symbol id="i-cup" viewBox="0 0 24 24"><path d="M5 3h14l-1.500 17a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2zm1.900 4 .3 3h9.600l.3-3z"/></symbol>
+  <symbol id="i-bars" viewBox="0 0 24 24"><path d="M3 5h18v2H3zm0 6h18v2H3zm0 6h18v2H3z"/></symbol>
+</svg>
 
-                                <div class="alert alert-warning d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                                        <span class="small font-weight-bold">Low Stock Processes</span>
-                                    </div>
-                                    <span class="badge badge-warning badge-pill text-white"></span>
-                                </div>
+<header class="top">
+  <button id="menu-btn" type="button" aria-label="Buka menu"><svg class="i"><use href="#i-bars"/></svg></button>
+  <img src="data:image/png;base64,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" alt="Logo Teras Putro Mapan">
+  <div>
+    <div class="brand-name">TERAS PUTRO MAPAN</div>
+    <div class="brand-addr">Sekebrok RT 01/08, Kel. Beji, Kec. Ungaran Timur, Kab. Semarang</div>
+  </div>
+</header>
+<div id="overlay"></div>
 
-                                <div class="alert alert-warning d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                                        <span class="small font-weight-bold">Low Stock Alerts</span>
-                                    </div>
-                                    <span class="badge badge-warning badge-pill text-white"></span>
-                                </div>
+<div class="shell">
+<aside id="side">
+  <nav class="nav">
+    <div class="nav-h">Admin</div>
+    <a href="#" class="active"><svg class="i"><use href="#i-grid"/></svg>Dashboard</a>
+    <a href="#"><svg class="i"><use href="#i-box"/></svg>Stok Barang</a>
+    <a href="#"><svg class="i"><use href="#i-line"/></svg>Penjualan Harian</a>
+    <a href="#"><svg class="i"><use href="#i-fire"/></svg>Produk Terlaris</a>
+    <a href="#"><svg class="i"><use href="#i-receipt"/></svg>Rekap Belanja</a>
+    <div class="nav-h">Operasional</div>
+    <a href="#"><svg class="i"><use href="#i-list"/></svg>Kasir</a>
+    <a href="#"><svg class="i"><use href="#i-globe"/></svg>Tes</a>
+  </nav>
+</aside>
 
-                                <div class="alert alert-danger d-flex justify-content-between align-items-center border-0 mb-0 py-2 px-3 rounded">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                                        <span class="small font-weight-bold">Lower Stock Alerts</span>
-                                    </div>
-                                    <span class="badge badge-danger badge-pill"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-7">
-                        <div class="card border-0 shadow-sm h-100 rounded-lg">
-                            <div class="card-body d-flex flex-column">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="font-weight-bold mb-3 text-dark">Penjualan Harian</h6>
-                                    <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
-                                </div>
-                                <!-- Container untuk Chart / Grafik -->
-                                <div class="flex-grow-1 w-100 d-flex align-items-center justify-content-center bg-light rounded" style="min-height: 200px;">
-                                    <!-- Tempat Rendering Line Chart -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Kiri: Produk Terlaris -->
-                    <div class="col-lg-6 mb-3 mb-lg-0">
-                        <div class="card border-0 shadow-sm h-100 rounded-lg">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="font-weight-bold m-0 text-dark">Produk Terlaris</h6>
-                                    <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-light rounded mr-3" style="width: 50px; height: 50px;"></div>
-                                            <div>
-                                                <div class="small font-weight-bold text-dark"><!-- Nama Produk --></div>
-                                                <div class="small text-muted"><!-- Harga --></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-light rounded mr-3" style="width: 50px; height: 50px;"></div>
-                                            <div>
-                                                <div class="small font-weight-bold text-dark"></div>
-                                                <div class="small text-muted"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-light rounded mr-3" style="width: 50px; height: 50px;"></div>
-                                            <div>
-                                                <div class="small font-weight-bold text-dark"></div>
-                                                <div class="small text-muted"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <div class="d-flex align-items-center">
-                                            <div class="bg-light rounded mr-3" style="width: 50px; height: 50px;"></div>
-                                            <div>
-                                                <div class="small font-weight-bold text-dark"></div>
-                                                <div class="small text-muted"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Kanan: Aktivitas Terkini -->
-                    <div class="col-lg-6">
-                        <div class="card border-0 shadow-sm h-100 rounded-lg">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="font-weight-bold m-0 text-dark">Rekap Belanja</h6>
-                                    <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
-                                </div>
-
-                                <div class="list-group list-group-flush border-0">
-                                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-light mr-3" style="width: 36px; height: 36px;"></div>
-                                            <div>
-                                                <div class="small font-weight-bold text-dark">Produk 1</div>
-                                                <div class="text-muted" style="font-size: 11px;"><!-- Keterangan aktivitas --></div>
-                                            </div>
-                                        </div>
-                                        <span class="text-muted small"><!-- Waktu / Jam --></span>
-                                    </div>
-
-                                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-light mr-3" style="width: 36px; height: 36px;"></div>
-                                            <div>
-                                                <div class="small font-weight-bold text-dark">Produk 2</div>
-                                                <div class="text-muted" style="font-size: 11px;"></div>
-                                            </div>
-                                        </div>
-                                        <span class="text-muted small"></span>
-                                    </div>
-
-                                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-light mr-3" style="width: 36px; height: 36px;"></div>
-                                            <div>
-                                                <div class="small font-weight-bold text-dark">Produk 3</div>
-                                                <div class="text-muted" style="font-size: 11px;"></div>
-                                            </div>
-                                        </div>
-                                        <span class="text-muted small"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<main>
+  <div class="searchbar">
+    <label class="search"><svg class="i"><use href="#i-search"/></svg><input type="text" id="q" placeholder="Cari" aria-label="Cari"></label>
+  </div>
+  <div class="content">
+    <div class="page-h">
+      <h1>Dashboard</h1>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <button class="btn" type="button"><svg class="i"><use href="#i-plus"/></svg>Action</button>
+      </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        (function () {
-            var $body = $("body");
-            var BREAKPOINT = 992; // sama dengan breakpoint "lg" Bootstrap
+    <div class="grid">
+      <section class="card c5">
+        <div class="card-h"><h2>Stok Barang</h2><a href="#">Lihat Semua</a></div>
+        <div class="alert bad"><span><svg class="i"><use href="#i-warn"/></svg>Stok Habis</span><b><i>3</i></b></div>
+        <div class="alert warn"><span><svg class="i"><use href="#i-warn"/></svg>Stok Menipis</span><b><i>7</i></b></div>
+        <div class="alert warn"><span><svg class="i"><use href="#i-warn"/></svg>Hampir Menipis</span><b><i>5</i></b></div>
+        <div class="alert bad"><span><svg class="i"><use href="#i-warn"/></svg>Restock Mendesak</span><b><i>2</i></b></div>
+      </section>
 
-            function isMobile() {
-                return window.innerWidth < BREAKPOINT;
-            }
+      <section class="card c7">
+        <div class="card-h">
+          <h2>Penjualan Harian <span class="demo" style="font-weight:400">· 7 hari terakhir</span></h2>
+          <div style="display:flex;align-items:center;gap:12px">
+            <a href="#">Lihat Semua</a>
+          </div>
+        </div>
+        <div class="chart-wrap"><canvas id="chart" role="img" aria-label="Diagram garis pendapatan harian"></canvas></div>
+      </section>
 
-            function toggleSidebar() {
-                if (isMobile()) {
-                    $body.toggleClass("sidebar-open");   // HP: geser masuk/keluar
-                } else {
-                    $body.toggleClass("sidebar-collapsed"); // Desktop: sembunyikan/tampilkan
-                }
-            }
+      <section class="card c6">
+        <div class="card-h"><h2>Produk Terlaris</h2><div style="display:flex;align-items:center;gap:12px"><button class="reroll" id="reroll" type="button"></button><a href="#">Lihat Semua</a></div></div>
+        <div class="prods" id="prods"></div>
+      </section>
 
-            function closeMobileSidebar() {
-                $body.removeClass("sidebar-open");
-            }
+      <section class="card c6">
+        <div class="card-h"><h2>Rekap Belanja</h2><a href="#">Lihat Semua</a></div>
+        <div id="rek"></div>
+      </section>
+    </div>
+  </div>
+</main>
+</div>
 
-            // Tombol hamburger di header & tombol di dalam sidebar
-            $("#menu-btn, #menu-toggle").on("click", function (e) {
-                e.preventDefault();
-                toggleSidebar();
-            });
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+const DATA = [["2026-06-04", 88000], ["2026-06-05", 119000], ["2026-06-06", 162000], ["2026-06-07", 123000], ["2026-06-08", 155000], ["2026-06-09", 76000], ["2026-06-10", 140000], ["2026-06-11", 108000], ["2026-06-12", 138000], ["2026-06-13", 99000], ["2026-06-14", 91000], ["2026-06-15", 182000], ["2026-06-16", 101000], ["2026-06-17", 169000], ["2026-06-18", 129000], ["2026-06-19", 205000], ["2026-06-20", 278000], ["2026-06-21", 138000], ["2026-06-22", 9000], ["2026-06-23", 146000], ["2026-06-24", 81000], ["2026-06-25", 165000], ["2026-06-26", 181000], ["2026-06-27", 223000], ["2026-06-28", 17000], ["2026-06-29", 225000], ["2026-06-30", 179000], ["2026-07-01", 250000], ["2026-07-02", 226000], ["2026-07-03", 216000], ["2026-07-04", 187000], ["2026-07-05", 125000], ["2026-07-06", 142000], ["2026-07-07", 169000], ["2026-07-08", 220000], ["2026-07-09", 181000], ["2026-07-10", 157000], ["2026-07-11", 235000], ["2026-07-12", 181000], ["2026-07-13", 223000], ["2026-07-14", 94000], ["2026-07-15", 169500], ["2026-07-16", 251000], ["2026-07-17", 183000], ["2026-07-18", 216000], ["2026-07-19", 175000], ["2026-07-20", 75000], ["2026-07-21", 348500], ["2026-07-22", 192000], ["2026-07-23", 195000], ["2026-07-24", 168000], ["2026-07-25", 287000], ["2026-07-26", 142000], ["2026-07-27", 328000], ["2026-07-28", 113500], ["2026-07-29", 165000], ["2026-07-30", 197500], ["2026-07-31", 143000], ["2026-08-01", 323000], ["2026-08-02", 132000], ["2026-08-03", 161000], ["2026-08-04", 264500], ["2026-08-05", 201500], ["2026-08-06", 114000], ["2026-08-07", 346500], ["2026-08-08", 233000], ["2026-08-09", 249500], ["2026-08-10", 287000], ["2026-08-11", 155000], ["2026-08-12", 196000], ["2026-08-13", 189000], ["2026-08-14", 236000], ["2026-08-15", 229500], ["2026-08-16", 133000], ["2026-08-17", 242000], ["2026-08-18", 282000], ["2026-08-19", 323000], ["2026-08-20", 228000], ["2026-08-21", 216500], ["2026-08-22", 252500], ["2026-08-23", 250000], ["2026-08-24", 243500], ["2026-08-25", 291500], ["2026-08-26", 176500], ["2026-08-27", 248000], ["2026-08-28", 389500], ["2026-08-29", 300000], ["2026-08-30", 204000], ["2026-08-31", 172000], ["2026-09-01", 278000], ["2026-09-02", 177500], ["2026-09-03", 198500], ["2026-09-04", 360500], ["2026-09-05", 152000], ["2026-09-06", 147000], ["2026-09-07", 162000], ["2026-09-08", 237000], ["2026-09-09", 198000], ["2026-09-10", 313000], ["2026-09-11", 255000], ["2026-09-12", 230000], ["2026-09-13", 182000], ["2026-09-14", 214000], ["2026-09-15", 247000], ["2026-09-16", 321000], ["2026-09-17", 323000], ["2026-09-18", 246000], ["2026-09-19", 238000], ["2026-09-20", 276500], ["2026-09-21", 166000], ["2026-09-22", 153000], ["2026-09-23", 239000], ["2026-09-24", 146000], ["2026-09-25", 179500], ["2026-09-26", 360500], ["2026-09-27", 141000], ["2026-09-28", 229000], ["2026-09-29", 209000], ["2026-09-30", 130500], ["2026-10-01", 170500], ["2026-10-02", 243500], ["2026-10-03", 325000], ["2026-10-04", 243000], ["2026-10-05", 174500], ["2026-10-06", 206000], ["2026-10-07", 198000], ["2026-10-08", 186000], ["2026-10-09", 179500], ["2026-10-10", 328500]];
+const REK = [["2026-10-07", 261750, "Es kristal, white coffe, gd(carebian, coolin, hemaviton, extrajoss, susu coklat, popice durian, popmie(bsr, kcl), kukubima anggur, innilo"], ["2026-10-05", 113000, "Eskristal, gd(vanilla, coolin), kapal api mantap, gula pasir,kerupuk"], ["2026-10-03", 200400, "Air isi ulang, es kristal, gd(freeze hazelnut, chococcinno), popice(coklat, vanilla blue), susu putih, jahe amh, mi gelas, popmie, ekomie, kecap"]];
+const CATALOG = [
+  ["Good Day Carebian",3000],["Good Day Mocacinno",3000],["Pop Mie Goreng",7000],["Pop Ice Taro",3000],
+  ["Kapal Api Mix",2500],["Nutrisari Florida Orange",2500],["ABC Klepon",3000],["Kukubima Anggur",2000],
+  ["Drink Beng-Beng",3500],["Es Kristal",2000],["Chocolatos Matcha",3500],["Luwak White Coffee",3000],
+  ["Mi Gelas",3000],["Segar Dingin",3000],["Extra Joss",2500],["C1000 Collagen",9000],
+  ["Hemaviton",3000],["Jasjus Melon",2500],["Susu Coklat",3500],["Ekomie",3500]
+];
+const rp = n => "Rp " + Math.round(n).toLocaleString("id-ID");
+const bln = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+const fmtD = s => { const [y,m,d] = s.split("-"); return +d + " " + bln[+m-1]; };
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 
-            // Klik area gelap di luar sidebar -> tutup
-            $("#sidebar-overlay").on("click", closeMobileSidebar);
+/* Penjualan harian */
+let chart, range = 7;
+function draw(){
+  const rows = range ? DATA.slice(-range) : DATA;
+  const vals = rows.map(r => r[1]);
+  if (!window.Chart) return;
+  const muted = css("--muted");
+  if (chart) chart.destroy();
+  chart = new Chart(document.getElementById("chart"), {
+    type: "line",
+    data: { labels: rows.map(r => fmtD(r[0])), datasets: [{
+      data: vals, borderColor: css("--chart-line"), backgroundColor: css("--chart-fill"),
+      fill: true, tension: .25, borderWidth: 2, pointRadius: range ? 3 : 0, pointHoverRadius: 5,
+      pointBackgroundColor: css("--chart-line")
+    }]},
+    options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
+      plugins: { legend: { display: false }, tooltip: { callbacks: {
+        title: i => fmtD(rows[i[0].dataIndex][0]) + " 2026", label: c => rp(c.parsed.y) } } },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: muted, maxTicksLimit: 8, maxRotation: 0 } },
+        y: { beginAtZero: true, grid: { color: css("--chart-grid") }, border: { display: false },
+             ticks: { color: muted, callback: v => (v/1000) + " rb", maxTicksLimit: 6 } }
+      } }
+  });
+}
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
+new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+draw();
 
-            // Klik salah satu menu di HP -> sidebar menutup otomatis
-            $("#sidebar-wrapper a").on("click", function () {
-                if (isMobile()) closeMobileSidebar();
-            });
+/* Produk terlaris: acak dari katalog produk di keterangan belanja */
+function roll(){
+  const pool = CATALOG.slice().sort(() => Math.random() - .5).slice(0, 4);
+  document.getElementById("prods").innerHTML = pool.map(([n,p]) => {
+    const sold = 40 + Math.floor(Math.random() * 160);
+    return '<div class="prod"><div class="thumb"><svg class="i"><use href="#i-cup"/></svg></div><div><div class="pn">' + n +
+      '</div><div class="pm">' + rp(p) + ' · ' + sold + ' terjual</div></div></div>';
+  }).join("");
+}
+document.getElementById("reroll").addEventListener("click", roll);
+roll();
 
-            // Tombol Esc -> tutup
-            $(document).on("keydown", function (e) {
-                if (e.key === "Escape") closeMobileSidebar();
-            });
+/* Rekap belanja dari kolom KET */
+document.getElementById("rek").innerHTML = REK.map(r =>
+  '<div class="rek"><div class="circ"><svg class="i"><use href="#i-receipt"/></svg></div><div class="tx"><div class="pn">Belanja ' +
+  fmtD(r[0]) + '</div><div>' + r[2] + '</div></div><div class="amt">' + rp(r[1]) + '</div></div>').join("");
 
-            // Jika layar diputar / diperbesar ke ukuran desktop, reset state mobile
-            $(window).on("resize", function () {
-                if (!isMobile()) closeMobileSidebar();
-            });
-        })();
-    </script>
-</body>
-</html>
+/* Sidebar HP */
+const body = document.body;
+document.getElementById("menu-btn").addEventListener("click", () => body.classList.toggle("open"));
+document.getElementById("overlay").addEventListener("click", () => body.classList.remove("open"));
+document.addEventListener("keydown", e => { if (e.key === "Escape") body.classList.remove("open"); });
+</script>
