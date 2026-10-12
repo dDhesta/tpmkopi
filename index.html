@@ -8,95 +8,19 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" />
+    <link rel="stylesheet" href="../asset/sidebar.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <style>
-        /* Jarak konten agar tepat di bawah header (tinggi header = 90px) */
-        body {
-            padding-top: 90px;
-        }
-
-        #wrapper {
-            min-height: calc(100vh - 90px);
-            overflow-x: hidden;
-        }
-
-        /* ===== SIDEBAR ===== */
-        #sidebar-wrapper {
-            width: 240px;
-            min-width: 240px;
-            flex-shrink: 0;
-            transition: margin-left .3s ease, transform .3s ease;
-        }
-
-        #page-content-wrapper {
-            min-width: 0; /* agar konten tidak melebar melebihi layar */
-            flex: 1;
-        }
-
-        #sidebar-overlay {
-            display: none;
-        }
-
-        /* Desktop (>= 992px): sidebar bisa disembunyikan/ditampilkan */
-        @media (min-width: 992px) {
-            body.sidebar-collapsed #sidebar-wrapper {
-                margin-left: -240px;
-            }
-        }
-
-        /* Mobile / tablet (< 992px): sidebar jadi menu geser (off-canvas) */
-        @media (max-width: 991.98px) {
-            #sidebar-wrapper {
-                position: fixed;
-                top: 90px;
-                left: 0;
-                bottom: 0;
-                height: calc(100vh - 90px);
-                overflow-y: auto;
-                z-index: 1040;
-                transform: translateX(-100%);
-                box-shadow: 4px 0 12px rgba(0, 0, 0, .15);
-            }
-
-            body.sidebar-open #sidebar-wrapper {
-                transform: translateX(0);
-            }
-
-            /* Lapisan gelap di belakang sidebar */
-            #sidebar-overlay {
-                position: fixed;
-                top: 90px;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, .45);
-                z-index: 1035;
-            }
-
-            body.sidebar-open #sidebar-overlay {
-                display: block;
-            }
-
-            /* Cegah halaman ikut ter-scroll saat sidebar terbuka */
-            body.sidebar-open {
-                overflow: hidden;
-            }
-        }
-    </style>
 </head>
 <body class="bg-light">
 
-    <!-- Header Fixed Navigation -->
     <header style="background-color: #007bff; z-index: 1030; height: 90px;"
             class="fw-semibold fixed-top d-flex align-items-center px-3 shadow-sm">
-        <!-- Tombol hamburger (hanya tampil di HP/tablet) -->
         <button id="menu-btn" type="button" class="btn btn-link text-white p-0 mr-3 d-lg-none" aria-label="Buka menu">
             <i class="fas fa-bars fa-lg"></i>
         </button>
         <div class="d-flex align-items-center position-relative">
-            <img src="tpmfix1.png" alt="Logo" style="height: 60px; margin-right: 12px;">
+            <img src="../asset/img/tpmfinal1.png" href="index.html" alt="Logo" style="height: 75px; margin-right: 12px;">
             <div style="line-height: 1.2;">
                 <div class="header-title" style="font-family: 'Oswald', sans-serif; color:white; font-weight: bold; font-size: 1.25rem;">
                     TERAS PUTRO MAPAN
@@ -117,27 +41,30 @@
         <div class="bg-white border-right" id="sidebar-wrapper">
 
             <div class="list-group list-group-flush py-2">
+            <div class="px-3 py-2 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
+                    Admin
+            </div>
                 <a href="#" class="list-group-item list-group-item-action border-0 active rounded-right my-1">
                     <i class="fas fa-th-large mr-3"></i> Dashboard
                 </a>
-                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-chart-line mr-3"></i> Stok Barang
+                <a href="stokbarang.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
+                    <i class="fas fa-cubes mr-3"></i> Stok Barang
                 </a>
-                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-user-plus mr-3"></i> Penjualan Harian
+                <a href="penjualanharian.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
+                    <i class="fas fa-chart-line mr-3"></i> Penjualan Harian
                 </a>
-                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-chart-pie mr-3"></i> Produk Terlaris
+                <a href="produkterlaris.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
+                    <i class="fas fa-fire mr-3"></i> Produk Terlaris
                 </a>
-                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-cubes mr-3"></i> Rekap Aktivitas
+                <a href="rekapbelanja.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
+                    <i class="fas fa-receipt mr-3"></i> Rekap Belanja
                 </a>
 
-                <div class="px-3 py-2 mt-3 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
-                    Kasir
+                <div class="px-3 py-2 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
+                    Operasional
                 </div>
                 <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-list-alt mr-3"></i> Tes
+                    <i class="fas fa-list-alt mr-3"></i> Kasir
                 </a>
                 <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
                     <i class="fas fa-globe mr-3"></i> Tes
