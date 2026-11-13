@@ -14,6 +14,6 @@ async function loadStokBarang() {
             return;
     }
 
-console.log("STATUS:", status*;
+console.log("STATUS:", status);
 console.log("ERROR:", error);
 console.log("DATA:", data);
