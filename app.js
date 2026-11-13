@@ -4,15 +4,16 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function loadStokBarang() {
 
-    const { data, error } = await supabaseClient
+    const { data, error, status } = await supabaseClient
         .from("barang")
         .select("*")
         .order("stok", { ascending: true });
 
     if (error) {
-        console.error(error);
-        return;
+            console.error(error);
+            return;
     }
 
-    console.log(data);
-}
+console.log("STATUS:", status*;
+console.log("ERROR:", error);
+console.log("DATA:", data);
