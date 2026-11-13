@@ -59,7 +59,7 @@ function renderStockAlerts(items) {
 async function loadProdukTerlaris() {
     const { data, error } = await supabaseClient
         .from("barang")
-        .select("nama, harga, stok")
+        .select("nama_barang, stok")
         .order("stok", { ascending: false })
         .limit(4);
 
