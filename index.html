@@ -99,12 +99,12 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="font-weight-bold mb-3 text-dark">Stok Barang</h6>
-                                    <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
+                                    <a href="stok.html" class="text-primary small font-weight-bold">Lihat Semua</a>
                                 </div>
 
-                                <div id="stock-alerts"></div>
-                                <div id="stock-alerts"></div>
-                                <div id="stock-alerts"></div>
+                                <div id="stock-alerts" aria-live="polite">
+                                    <div class="text-muted small">Memuat data stok...</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -114,11 +114,11 @@
                             <div class="card-body d-flex flex-column">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="font-weight-bold mb-3 text-dark">Penjualan Harian</h6>
-                                    <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
+                                    <a href="penjualan.html" class="text-primary small font-weight-bold">Lihat Semua</a>
                                 </div>
-                                <!-- Container untuk Chart / Grafik -->
-                                <div class="flex-grow-1 w-100 d-flex align-items-center justify-content-center bg-light rounded" style="min-height: 200px;">
-                                    <!-- Tempat Rendering Line Chart -->
+                                <!-- Grafik total penjualan tujuh hari terakhir -->
+                                <div id="sales-chart" class="flex-grow-1 w-100 d-flex align-items-end justify-content-around bg-light rounded p-3" style="min-height: 200px;" aria-live="polite">
+                                    <span class="text-muted small">Memuat data penjualan...</span>
                                 </div>
                             </div>
                         </div>
@@ -132,58 +132,27 @@
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="font-weight-bold m-0 text-dark">Produk Terlaris</h6>
-                                    <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
+                                    <a href="terlaris.html" class="text-primary small font-weight-bold">Lihat Semua</a>
                                 </div>
 
-                                <div class="row">
-                                    <div id="produk-terlaris"></div>
+                                <div class="row" id="produk-terlaris" aria-live="polite">
+                                    <div class="col-12 text-muted small">Memuat data produk...</div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Kanan: Aktivitas Terkini -->
+                    <!-- Kanan: Rekap Belanja -->
                     <div class="col-lg-6">
                         <div class="card border-0 shadow-sm h-100 rounded-lg">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h6 class="font-weight-bold m-0 text-dark">Rekap Belanja</h6>
-                                    <a href="#" class="text-primary small font-weight-bold">Lihat Semua</a>
+                                    <a href="belanja.html" class="text-primary small font-weight-bold">Lihat Semua</a>
                                 </div>
 
-                                <div class="list-group list-group-flush border-0">
-                                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-light mr-3" style="width: 36px; height: 36px;"></div>
-                                            <div>
-                                                <div class="small font-weight-bold text-dark">Produk 1</div>
-                                                <div class="text-muted" style="font-size: 11px;"><!-- Keterangan aktivitas --></div>
-                                            </div>
-                                        </div>
-                                        <span class="text-muted small"><!-- Waktu / Jam --></span>
-                                    </div>
-
-                                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-light mr-3" style="width: 36px; height: 36px;"></div>
-                                            <div>
-                                                <div class="small font-weight-bold text-dark">Produk 2</div>
-                                                <div class="text-muted" style="font-size: 11px;"></div>
-                                            </div>
-                                        </div>
-                                        <span class="text-muted small"></span>
-                                    </div>
-
-                                    <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-                                        <div class="d-flex align-items-center">
-                                            <div class="rounded-circle bg-light mr-3" style="width: 36px; height: 36px;"></div>
-                                            <div>
-                                                <div class="small font-weight-bold text-dark">Produk 3</div>
-                                                <div class="text-muted" style="font-size: 11px;"></div>
-                                            </div>
-                                        </div>
-                                        <span class="text-muted small"></span>
-                                    </div>
+                                <div id="rekap-belanja" class="list-group list-group-flush border-0" aria-live="polite">
+                                    <div class="text-muted small py-2">Memuat data belanja...</div>
                                 </div>
                             </div>
                         </div>
