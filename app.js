@@ -68,39 +68,49 @@ async function loadStokBarang() {
     const container = document.getElementById("stock-alerts");
     if (!container) return;
 
+    // Dashboard menampilkan jumlah per kategori, bukan daftar semua barang.
     const { data, error } = await supabaseClient
         .from("barang")
-        .select("id, nama_barang, stok, satuan, aktif")
-        .eq("aktif", true)
-        .order("stok", { ascending: true })
-        .order("nama_barang", { ascending: true });
+        .select("stok, aktif");
 
     if (error) {
-        console.error("Gagal memuat stok barang:", error);
-        showMessage("stock-alerts", "Data stok gagal dimuat.", "danger");
+        console.error("Gagal memuat ringkasan stok:", error);
+        showMessage("stock-alerts", "Ringkasan stok gagal dimuat.", "danger");
         return;
     }
 
     if (!data?.length) {
-        showMessage("stock-alerts", "Belum ada data stok barang.");
+        showMessage("stock-alerts", "Belum ada data barang.");
         return;
     }
 
-    container.innerHTML = data.map(item => {
+    const inactiveCount = data.filter(item => item.aktif === false).length;
+    const activeItems = data.filter(item => item.aktif === true);
+    const outOfStockCount = activeItems.filter(item => Number(item.stok) === 0).length;
+    const lowStockCount = activeItems.filter(item => {
         const stock = Number(item.stok) || 0;
-        const color = stock === 0 ? "danger" : stock > 5 ? "success" : stock > 3 ? "warning" : "danger";
-        const label = stock === 0 ? "Stok habis" : stock <= 3 ? "Stok rendah" : stock <= 5 ? "Perlu diperhatikan" : "Stok aman";
+        return stock > 0 && stock <= 5;
+    }).length;
+    const safeStockCount = activeItems.filter(item => Number(item.stok) > 5).length;
 
-        return `
-            <div class="alert alert-${color} d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded">
-                <div class="mr-2">
-                    <div class="small font-weight-bold">${escapeHtml(item.nama_barang)}</div>
-                    <div class="small">${label}</div>
-                </div>
-                <span class="badge badge-${color} badge-pill">${stock} ${escapeHtml(item.satuan || "pcs")}</span>
+    const summaries = [
+        { label: "Stok Inactive", count: inactiveCount, color: "secondary", icon: "fa-ban" },
+        { label: "Stok Habis", count: outOfStockCount, color: "danger", icon: "fa-box-open" },
+        { label: "Stok Menipis", count: lowStockCount, color: "warning", icon: "fa-exclamation-triangle" },
+        { label: "Stok Aman", count: safeStockCount, color: "success", icon: "fa-check-circle" }
+    ];
+
+    container.innerHTML = summaries.map(item => `
+        <div class="alert alert-${item.color} d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded">
+            <div class="d-flex align-items-center">
+                <i class="fas ${item.icon} mr-2" aria-hidden="true"></i>
+                <span class="small font-weight-bold">${item.label}</span>
             </div>
-        `;
-    }).join("");
+            <span class="badge badge-${item.color} badge-pill">
+                ${item.count} ${item.count === 1 ? "produk" : "produk"}
+            </span>
+        </div>
+    `).join("");
 }
 
 async function loadPenjualanHarian() {
