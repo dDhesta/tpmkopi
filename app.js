@@ -55,8 +55,7 @@ async function loadStokBarang() {
     ];
 
     container.innerHTML = ringkasan.map(item => `
-        <div class="alert alert-${item.warna} d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded"
-             style="min-height: 56px;">
+        <div class="alert alert-${item.warna} d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded">
             <div class="d-flex align-items-center">
                 <i class="fas ${item.ikon} mr-2" aria-hidden="true"></i>
                 <span class="small font-weight-bold">${item.label}</span>
