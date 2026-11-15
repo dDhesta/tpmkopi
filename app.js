@@ -4,14 +4,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function loadDashboard() {
     if (typeof supabaseClient === "undefined") {
-        showMessage("stock-alerts", "Koneksi database belum dikonfigurasi.", "danger");
-        showMessage("sales-chart", "Koneksi database belum dikonfigurasi.", "danger");
-        showMessage("produk-terlaris", "Koneksi database belum dikonfigurasi.", "danger");
-        showMessage("rekap-belanja", "Koneksi database belum dikonfigurasi.", "danger");
+        ["stock-alerts", "sales-chart", "produk-terlaris", "rekap-belanja"].forEach(id => {
+            showMessage(id, "Koneksi database belum dikonfigurasi.", "danger");
+        });
         return;
     }
 
-    await Promise.all([
+    await Promise.allSettled([
         loadStokBarang(),
         loadPenjualanHarian(),
         loadProdukTerlaris(),
@@ -33,8 +32,14 @@ function showMessage(elementId, message, type = "muted") {
     const container = document.getElementById(elementId);
     if (!container) return;
 
-    const bootstrapType = type === "muted" ? "secondary" : type;
-    container.innerHTML = `<div class="text-${bootstrapType} small py-2">${escapeHtml(message)}</div>`;
+    const color = type === "muted" ? "secondary" : type;
+    container.innerHTML = `<div class="text-${color} small py-2">${escapeHtml(message)}</div>`;
+}
+
+function showQueryError(elementId, title, error) {
+    console.error(`${title}:`, error);
+    const detail = error?.message || error?.details || error?.hint || "Periksa kebijakan akses (RLS) dan nama tabel/kolom.";
+    showMessage(elementId, `${title}: ${detail}`, "danger");
 }
 
 function formatRupiah(value) {
@@ -73,63 +78,29 @@ async function loadStokBarang() {
         .select("stok, aktif");
 
     if (error) {
-        console.error("Gagal memuat ringkasan stok:", error);
-        showMessage("stock-alerts", "Ringkasan stok gagal dimuat.", "danger");
+        showQueryError("stock-alerts", "Ringkasan stok gagal dimuat", error);
         return;
     }
-
     if (!data?.length) {
         showMessage("stock-alerts", "Belum ada data barang.");
         return;
     }
 
-    const barangAktif = data.filter(item => item.aktif === true);
-
-    const jumlahInactive = data.filter(item => item.aktif === false).length;
-    const jumlahHabis = barangAktif.filter(item => Number(item.stok) === 0).length;
-    const jumlahMenipis = barangAktif.filter(item => {
-        const stok = Number(item.stok) || 0;
-        return stok > 0 && stok <= 5;
-    }).length;
-    const jumlahAman = barangAktif.filter(item => Number(item.stok) > 5).length;
-
-    const ringkasan = [
-        {
-            label: "Stok Inactive",
-            jumlah: jumlahInactive,
-            warna: "secondary",
-            ikon: "fa-ban"
-        },
-        {
-            label: "Stok Habis",
-            jumlah: jumlahHabis,
-            warna: "danger",
-            ikon: "fa-box-open"
-        },
-        {
-            label: "Stok Menipis",
-            jumlah: jumlahMenipis,
-            warna: "warning",
-            ikon: "fa-exclamation-triangle"
-        },
-        {
-            label: "Stok Aman",
-            jumlah: jumlahAman,
-            warna: "success",
-            ikon: "fa-check-circle"
-        }
+    const active = data.filter(item => item.aktif === true);
+    const summaries = [
+        { label: "Stok Inactive", count: data.filter(item => item.aktif === false).length, color: "secondary", icon: "fa-ban" },
+        { label: "Stok Habis", count: active.filter(item => Number(item.stok) === 0).length, color: "danger", icon: "fa-box-open" },
+        { label: "Stok Menipis", count: active.filter(item => Number(item.stok) > 0 && Number(item.stok) <= 5).length, color: "warning", icon: "fa-exclamation-triangle" },
+        { label: "Stok Aman", count: active.filter(item => Number(item.stok) > 5).length, color: "success", icon: "fa-check-circle" }
     ];
 
-    container.innerHTML = ringkasan.map(item => `
-        <div class="alert alert-${item.warna} d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded"
-             style="min-height: 56px;">
+    container.innerHTML = summaries.map(item => `
+        <div class="alert alert-${item.color} d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded" style="min-height: 56px;">
             <div class="d-flex align-items-center">
-                <i class="fas ${item.ikon} mr-2" aria-hidden="true"></i>
+                <i class="fas ${item.icon} mr-2" aria-hidden="true"></i>
                 <span class="small font-weight-bold">${item.label}</span>
             </div>
-            <span class="badge badge-${item.warna} badge-pill">
-                ${item.jumlah} produk
-            </span>
+            <span class="badge badge-${item.color} badge-pill">${item.count} produk</span>
         </div>
     `).join("");
 }
@@ -138,11 +109,10 @@ async function loadPenjualanHarian() {
     const container = document.getElementById("sales-chart");
     if (!container) return;
 
+    // Tujuh hari kalender terakhir, termasuk hari ini.
     const today = new Date();
     const endExclusive = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
     const startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
-    const startKey = toDateKey(startDate);
-    const endKey = toDateKey(endExclusive);
 
     const { data, error } = await supabaseClient
         .from("penjualan")
@@ -153,8 +123,7 @@ async function loadPenjualanHarian() {
         .order("tanggal", { ascending: true });
 
     if (error) {
-        console.error("Gagal memuat penjualan harian:", error);
-        showMessage("sales-chart", "Data penjualan gagal dimuat.", "danger");
+        showQueryError("sales-chart", "Data penjualan gagal dimuat", error);
         return;
     }
 
@@ -165,56 +134,72 @@ async function loadPenjualanHarian() {
     }
 
     (data || []).forEach(sale => {
-        const key = toDateKey(new Date(sale.tanggal));
-        if (key >= startKey && key < endKey && totalsByDay.has(key)) {
+        const date = new Date(sale.tanggal);
+        if (Number.isNaN(date.getTime())) return;
+        const key = toDateKey(date);
+        if (totalsByDay.has(key)) {
             totalsByDay.set(key, totalsByDay.get(key) + (Number(sale.total) || 0));
         }
     });
 
     const dailyTotals = Array.from(totalsByDay.entries());
-    const maxTotal = Math.max(...dailyTotals.map(([, total]) => total), 0);
+    const scaleMaximum = 500000;
+    const axisValues = [500000, 400000, 300000, 200000, 100000, 0];
 
-    container.classList.remove("align-items-end");
-    container.classList.add("align-items-stretch");
-    container.innerHTML = dailyTotals.map(([key, total]) => {
-        const [year, month, day] = key.split("-").map(Number);
-        const labelDate = new Date(year, month - 1, day);
-        const barHeight = maxTotal > 0 ? Math.max((total / maxTotal) * 100, total > 0 ? 8 : 0) : 0;
-
-        return `
-            <div class="d-flex flex-column justify-content-end align-items-center text-center mx-1" style="flex: 1; min-width: 0; height: 100%;" title="${escapeHtml(formatTanggal(labelDate, { day: "numeric", month: "long" }))}: ${escapeHtml(formatRupiah(total))}">
-                <div class="small text-muted mb-1" style="font-size: 10px; white-space: nowrap;">${escapeHtml(formatRupiah(total))}</div>
-                <div class="bg-primary rounded-top w-100" style="height: ${barHeight}%; min-height: ${total > 0 ? 4 : 0}px;"></div>
-                <div class="small text-muted mt-2" style="font-size: 10px; white-space: nowrap;">${escapeHtml(new Intl.DateTimeFormat("id-ID", { weekday: "short" }).format(labelDate))}<br>${labelDate.getDate()}</div>
+    // Tampilkan skala grafik Rp100.000–Rp500.000; nilai harian tetap ditampilkan apa adanya.
+    container.classList.remove("align-items-end", "justify-content-around");
+    container.classList.add("align-items-stretch", "justify-content-start");
+    container.innerHTML = `
+        <div class="d-flex w-100 h-100 align-items-stretch">
+            <div class="d-flex flex-column justify-content-between text-muted mr-2" style="height: 175px; font-size: 10px; white-space: nowrap;">
+                ${axisValues.map(value => `<span>${value === 0 ? "Rp 0" : `Rp ${value / 1000}rb`}</span>`).join("")}
             </div>
-        `;
-    }).join("");
+            <div class="d-flex justify-content-around flex-grow-1">
+                ${dailyTotals.map(([key, total]) => {
+                    const [year, month, day] = key.split("-").map(Number);
+                    const date = new Date(year, month - 1, day);
+                    const barHeight = Math.min((total / scaleMaximum) * 100, 100);
+                    return `
+                        <div class="d-flex flex-column align-items-center text-center mx-1" style="flex: 1; min-width: 0; height: 175px;">
+                            <span class="small text-muted" style="font-size: 9px; white-space: nowrap;">${escapeHtml(formatRupiah(total))}</span>
+                            <div class="d-flex align-items-end justify-content-center w-100" style="height: 125px;">
+                                <div class="bg-primary rounded-top" role="img" aria-label="${escapeHtml(formatTanggal(date))}: ${escapeHtml(formatRupiah(total))}" style="width: 65%; height: ${barHeight}%; min-height: ${total > 0 ? 3 : 0}px;"></div>
+                            </div>
+                            <span class="small text-muted mt-1" style="font-size: 10px; white-space: nowrap;">${escapeHtml(new Intl.DateTimeFormat("id-ID", { weekday: "short" }).format(date))}<br>${day}</span>
+                        </div>
+                    `;
+                }).join("")}
+            </div>
+        </div>
+    `;
 }
 
 async function loadProdukTerlaris() {
     const target = document.getElementById("produk-terlaris");
     if (!target) return;
 
+    // Ambil kuantitas dari detail transaksi selesai, bukan dari stok barang.
     const { data, error } = await supabaseClient
         .from("detail_penjualan")
-        .select("jumlah, barang(nama_barang), penjualan!inner(status)")
+        .select("barang_id, jumlah, barang(nama_barang), penjualan!inner(status)")
         .eq("penjualan.status", "selesai");
 
     if (error) {
-        console.error("Gagal memuat produk terlaris:", error);
-        showMessage("produk-terlaris", "Data produk terlaris gagal dimuat.", "danger");
+        showQueryError("produk-terlaris", "Data produk terlaris gagal dimuat", error);
         return;
     }
 
-    const quantities = new Map();
+    const totals = new Map();
     (data || []).forEach(detail => {
         const product = getRelation(detail, "barang");
         if (!product?.nama_barang) return;
-        quantities.set(product.nama_barang, (quantities.get(product.nama_barang) || 0) + (Number(detail.jumlah) || 0));
+        const key = String(detail.barang_id);
+        const current = totals.get(key) || { nama: product.nama_barang, jumlah: 0 };
+        current.jumlah += Number(detail.jumlah) || 0;
+        totals.set(key, current);
     });
 
-    const bestSellers = Array.from(quantities.entries())
-        .map(([nama, jumlah]) => ({ nama, jumlah }))
+    const bestSellers = Array.from(totals.values())
         .sort((a, b) => b.jumlah - a.jumlah || a.nama.localeCompare(b.nama, "id"))
         .slice(0, 6);
 
@@ -226,9 +211,9 @@ async function loadProdukTerlaris() {
     target.innerHTML = bestSellers.map((item, index) => `
         <div class="col-12 col-md-6 mb-3">
             <div class="d-flex align-items-center">
-                <div class="bg-light rounded-circle mr-3 d-flex align-items-center justify-content-center text-primary font-weight-bold" style="width: 42px; height: 42px; flex: 0 0 42px;">${index + 1}</div>
-                <div>
-                    <div class="small font-weight-bold text-dark">${escapeHtml(item.nama)}</div>
+                <div class="bg-light rounded mr-3 d-flex align-items-center justify-content-center text-primary font-weight-bold" style="width: 42px; height: 42px; flex: 0 0 42px;">${index + 1}</div>
+                <div class="text-truncate">
+                    <div class="small font-weight-bold text-dark text-truncate">${escapeHtml(item.nama)}</div>
                     <div class="small text-muted">${item.jumlah} terjual</div>
                 </div>
             </div>
@@ -247,8 +232,7 @@ async function loadRekapBelanja() {
         .limit(3);
 
     if (error) {
-        console.error("Gagal memuat rekap belanja:", error);
-        showMessage("rekap-belanja", "Data rekap belanja gagal dimuat.", "danger");
+        showQueryError("rekap-belanja", "Data rekap belanja gagal dimuat", error);
         return;
     }
 
@@ -257,18 +241,18 @@ async function loadRekapBelanja() {
         return;
     }
 
-    target.innerHTML = data.map(purchase => `
+    target.innerHTML = data.map((purchase, index) => `
         <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
             <div class="d-flex align-items-center mr-2">
                 <div class="rounded-circle bg-light mr-3 d-flex align-items-center justify-content-center text-primary" style="width: 36px; height: 36px; flex: 0 0 36px;">
-                    <i class="fas fa-receipt"></i>
+                    <i class="fas fa-receipt" aria-hidden="true"></i>
                 </div>
-                <div>
-                    <div class="small font-weight-bold text-dark">${escapeHtml(purchase.nomor_belanja || `Belanja #${purchase.id}`)}</div>
+                <div class="text-truncate">
+                    <div class="small font-weight-bold text-dark text-truncate">${escapeHtml(purchase.nomor_belanja || `Rekap ${index + 1}`)}</div>
                     <div class="text-muted" style="font-size: 11px;">${escapeHtml(purchase.nama_pemasok || "Pemasok tidak dicantumkan")} · ${escapeHtml(formatTanggal(purchase.tanggal))}</div>
                 </div>
             </div>
-            <div class="text-right">
+            <div class="text-right ml-2">
                 <div class="small font-weight-bold text-dark">${escapeHtml(formatRupiah(purchase.total))}</div>
                 <div class="text-muted small">${escapeHtml(purchase.status || "")}</div>
             </div>
