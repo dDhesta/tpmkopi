@@ -225,10 +225,10 @@ async function loadRekapBelanja() {
     const target = document.getElementById("rekap-belanja");
     if (!target) return;
 
-    // Nama kolom disesuaikan dengan tabel public.belanja pada skema database.
+    // nomor_belanja tidak digunakan karena kolom tersebut tidak tersedia di tabel Supabase.
     const { data, error } = await supabaseClient
         .from("belanja")
-        .select("id, nomor_belanja, tanggal, nama_pemasok, total, status")
+        .select("id, tanggal, nama_pemasok, total, status")
         .order("tanggal", { ascending: false })
         .limit(3);
 
@@ -251,7 +251,7 @@ async function loadRekapBelanja() {
                     <i class="fas fa-receipt" aria-hidden="true"></i>
                 </div>
                 <div>
-                    <div class="small font-weight-bold text-dark">${escapeHtml(purchase.nomor_belanja || `Belanja #${purchase.id}`)}</div>
+                    <div class="small font-weight-bold text-dark">Belanja #${escapeHtml(purchase.id)}</div>
                     <div class="text-muted" style="font-size: 11px;">${escapeHtml(purchase.nama_pemasok || "Pemasok tidak dicantumkan")} · ${escapeHtml(formatTanggal(purchase.tanggal))}</div>
                 </div>
             </div>
