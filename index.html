@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dashboard</title>
+    <title>Dashboard - Teras Putro Mapan</title>
     <!-- Bootstrap 4.6.2 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
     <!-- Font Awesome -->
@@ -24,8 +24,8 @@
         <button id="menu-btn" type="button" class="btn btn-link text-white p-0 mr-3 d-lg-none" aria-label="Buka menu">
             <i class="fas fa-bars fa-lg"></i>
         </button>
-        <div class="d-flex align-items-center position-relative">
-            <img src="tpmfinal1.webp" href="index.html" alt="Logo" style="height: 75px; margin-right: 12px;">
+        <a href="index.html" class="d-flex align-items-center position-relative text-decoration-none">
+            <img src="tpmfinal1.webp" alt="Logo Teras Putro Mapan" style="height: 75px; margin-right: 12px;">
             <div style="line-height: 1.2;">
                 <div class="header-title" style="font-family: 'Oswald', sans-serif; color:white; font-weight: bold; font-size: 1.25rem;">
                     TERAS PUTRO MAPAN
@@ -34,7 +34,7 @@
                     Sekebrok RT 01/08, Kel. Beji, Kec. Ungaran Timur, Kab. Semarang
                 </div>
             </div>
-        </div>
+        </a>
     </header>
 
     <!-- Overlay (klik untuk menutup sidebar di HP) -->
@@ -44,12 +44,11 @@
     <div class="d-flex" id="wrapper">
         <!-- Sidebar Navigation -->
         <div class="bg-white border-right" id="sidebar-wrapper">
-
             <div class="list-group list-group-flush py-2">
-            <div class="px-3 py-2 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
+                <div class="px-3 py-2 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
                     Admin
-            </div>
-                <a href="#" class="list-group-item list-group-item-action border-0 active rounded-right my-1">
+                </div>
+                <a href="index.html" class="list-group-item list-group-item-action border-0 active rounded-right my-1">
                     <i class="fas fa-th-large mr-3"></i> Dashboard
                 </a>
                 <a href="stok.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
@@ -68,10 +67,10 @@
                 <div class="px-3 py-2 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
                     Operasional
                 </div>
-                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
+                <a href="kasir.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
                     <i class="fas fa-cash-register mr-3"></i> Kasir
                 </a>
-                <a href="#" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
+                <a href="tagihan.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
                     <i class="fas fa-globe mr-3"></i> Tagihan
                 </a>
             </div>
@@ -79,17 +78,16 @@
 
         <!-- Page Content -->
         <div id="page-content-wrapper">
-
             <div class="container-fluid p-3 p-md-4">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h4 class="font-weight-bold text-dark m-0" style="font-family: 'Oswald', sans-serif;">Dashboard</h4>
-                    <div class="input-group input-group-sm bg-light rounded-pill border px-2 py-1">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+                    <h4 class="font-weight-bold text-dark mb-2 mb-md-0" style="font-family: 'Oswald', sans-serif;">Dashboard</h4>
+                    <div class="input-group input-group-sm bg-white rounded-pill border px-2 py-1" style="max-width: 360px;">
                         <div class="input-group-prepend">
                             <span class="input-group-text bg-transparent border-0 text-muted">
                                 <i class="fas fa-search"></i>
                             </span>
                         </div>
-                        <input type="text" class="form-control bg-transparent border-0 shadow-none" placeholder="Cari" aria-label="Search">
+                        <input id="dashboard-search" type="text" class="form-control bg-transparent border-0 shadow-none" placeholder="Cari produk atau pemasok..." aria-label="Cari">
                     </div>
                 </div>
 
@@ -98,7 +96,7 @@
                         <div class="card border-0 shadow-sm h-100 rounded-lg">
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="font-weight-bold mb-3 text-dark">Stok Barang</h6>
+                                    <h6 class="font-weight-bold m-0 text-dark">Stok Barang</h6>
                                     <a href="stok.html" class="text-primary small font-weight-bold">Lihat Semua</a>
                                 </div>
 
@@ -113,11 +111,11 @@
                         <div class="card border-0 shadow-sm h-100 rounded-lg">
                             <div class="card-body d-flex flex-column">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="font-weight-bold mb-3 text-dark">Penjualan Harian</h6>
+                                    <h6 class="font-weight-bold m-0 text-dark">Penjualan Harian</h6>
                                     <a href="penjualan.html" class="text-primary small font-weight-bold">Lihat Semua</a>
                                 </div>
                                 <!-- Grafik total penjualan tujuh hari terakhir -->
-                                <div id="sales-chart" class="flex-grow-1 w-100 d-flex align-items-end justify-content-around bg-light rounded p-3" style="min-height: 200px;" aria-live="polite">
+                                <div id="sales-chart" class="flex-grow-1 w-100 d-flex align-items-end justify-content-around bg-light rounded p-3" style="min-height: 220px;" aria-live="polite">
                                     <span class="text-muted small">Memuat data penjualan...</span>
                                 </div>
                             </div>
@@ -166,7 +164,7 @@
     <script>
         (function () {
             var $body = $("body");
-            var BREAKPOINT = 992; // sama dengan breakpoint "lg" Bootstrap
+            var BREAKPOINT = 992;
 
             function isMobile() {
                 return window.innerWidth < BREAKPOINT;
@@ -174,9 +172,9 @@
 
             function toggleSidebar() {
                 if (isMobile()) {
-                    $body.toggleClass("sidebar-open");   // HP: geser masuk/keluar
+                    $body.toggleClass("sidebar-open");
                 } else {
-                    $body.toggleClass("sidebar-collapsed"); // Desktop: sembunyikan/tampilkan
+                    $body.toggleClass("sidebar-collapsed");
                 }
             }
 
@@ -184,26 +182,21 @@
                 $body.removeClass("sidebar-open");
             }
 
-            // Tombol hamburger di header & tombol di dalam sidebar
             $("#menu-btn, #menu-toggle").on("click", function (e) {
                 e.preventDefault();
                 toggleSidebar();
             });
 
-            // Klik area gelap di luar sidebar -> tutup
             $("#sidebar-overlay").on("click", closeMobileSidebar);
 
-            // Klik salah satu menu di HP -> sidebar menutup otomatis
             $("#sidebar-wrapper a").on("click", function () {
                 if (isMobile()) closeMobileSidebar();
             });
 
-            // Tombol Esc -> tutup
             $(document).on("keydown", function (e) {
                 if (e.key === "Escape") closeMobileSidebar();
             });
 
-            // Jika layar diputar / diperbesar ke ukuran desktop, reset state mobile
             $(window).on("resize", function () {
                 if (!isMobile()) closeMobileSidebar();
             });
