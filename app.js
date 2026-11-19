@@ -16,9 +16,9 @@ document.addEventListener("DOMContentLoaded", () => {
             );
             renderRekapBelanja(
                 cachedRekapBelanja.filter(item =>
-                    (item.nomor_belanja && item.nomor_belanja.toLowerCase().includes(keyword)) ||
-                    (item.nama_pemasok && item.nama_pemasok.toLowerCase().includes(keyword)) ||
-                    String(item.id).includes(keyword)
+                    `belanja #${item.id}`.includes(keyword) ||
+                    String(item.id).includes(keyword) ||
+                    (item.nama_pemasok && item.nama_pemasok.toLowerCase().includes(keyword))
                 )
             );
         });
@@ -88,7 +88,7 @@ function toDateKey(date) {
     return `${year}-${month}-${day}`;
 }
 
-// 1. STOK BARANG (menggunakan kolom stok, stok_minimum, aktif)
+// 1. STOK BARANG
 async function loadStokBarang() {
     const container = document.getElementById("stock-alerts");
     if (!container) return;
@@ -141,7 +141,7 @@ async function loadStokBarang() {
     `).join("");
 }
 
-// 2. PENJUALAN HARIAN (tabel penjualan: tanggal, total, status)
+// 2. PENJUALAN HARIAN
 async function loadPenjualanHarian() {
     const container = document.getElementById("sales-chart");
     if (!container) return;
@@ -204,7 +204,7 @@ async function loadPenjualanHarian() {
     }).join("");
 }
 
-// 3. PRODUK TERLARIS (relasi detail_penjualan -> barang & penjualan)
+// 3. PRODUK TERLARIS
 async function loadProdukTerlaris() {
     const target = document.getElementById("produk-terlaris");
     if (!target) return;
@@ -265,14 +265,14 @@ function renderProdukTerlaris(items) {
     `).join("");
 }
 
-// 4. REKAP BELANJA (menggunakan nomor_belanja sesuai tabel public.belanja)
+// 4. REKAP BELANJA (menggunakan id sebagai pengganti nomor_belanja)
 async function loadRekapBelanja() {
     const target = document.getElementById("rekap-belanja");
     if (!target) return;
 
     const { data, error } = await supabaseClient
         .from("belanja")
-        .select("id, nomor_belanja, tanggal, nama_pemasok, total, status")
+        .select("id, tanggal, nama_pemasok, total, status")
         .order("tanggal", { ascending: false })
         .limit(5);
 
@@ -297,7 +297,6 @@ function renderRekapBelanja(items) {
     }
 
     target.innerHTML = topPurchases.map(purchase => {
-        const kodeBelanja = purchase.nomor_belanja || `Belanja #${purchase.id}`;
         const badgeStatus = purchase.status === "batal" ? "badge-danger" : "badge-success";
 
         return `
@@ -308,7 +307,7 @@ function renderRekapBelanja(items) {
                         <i class="fas fa-receipt" aria-hidden="true"></i>
                     </div>
                     <div class="text-truncate">
-                        <div class="small font-weight-bold text-dark text-truncate">${escapeHtml(kodeBelanja)}</div>
+                        <div class="small font-weight-bold text-dark text-truncate">Belanja #${escapeHtml(purchase.id)}</div>
                         <div class="text-muted text-truncate" style="font-size: 11px;">
                             ${escapeHtml(purchase.nama_pemasok || "Pemasok umum")} · ${escapeHtml(formatTanggal(purchase.tanggal))}
                         </div>
