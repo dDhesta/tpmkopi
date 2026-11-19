@@ -1,5 +1,28 @@
+let cachedProdukTerlaris = [];
+let cachedRekapBelanja = [];
+
 document.addEventListener("DOMContentLoaded", () => {
     loadDashboard();
+
+    const searchInput = document.getElementById("dashboard-search");
+    if (searchInput) {
+        searchInput.addEventListener("input", (event) => {
+            const keyword = event.target.value.trim().toLowerCase();
+            renderProdukTerlaris(
+                cachedProdukTerlaris.filter(item =>
+                    item.nama.toLowerCase().includes(keyword) ||
+                    (item.kode && item.kode.toLowerCase().includes(keyword))
+                )
+            );
+            renderRekapBelanja(
+                cachedRekapBelanja.filter(item =>
+                    (item.nomor_belanja && item.nomor_belanja.toLowerCase().includes(keyword)) ||
+                    (item.nama_pemasok && item.nama_pemasok.toLowerCase().includes(keyword)) ||
+                    String(item.id).includes(keyword)
+                )
+            );
+        });
+    }
 });
 
 async function loadDashboard() {
@@ -34,7 +57,8 @@ function showMessage(elementId, message, type = "muted") {
     if (!container) return;
 
     const bootstrapType = type === "muted" ? "secondary" : type;
-    container.innerHTML = `<div class="text-${bootstrapType} small py-2">${escapeHtml(message)}</div>`;
+    const colWrapper = elementId === "produk-terlaris" ? "col-12 " : "";
+    container.innerHTML = `<div class="${colWrapper}text-${bootstrapType} small py-2">${escapeHtml(message)}</div>`;
 }
 
 function formatRupiah(value) {
@@ -57,7 +81,6 @@ function getRelation(row, key) {
     return Array.isArray(value) ? value[0] : value;
 }
 
-// Menghasilkan YYYY-MM-DD berdasarkan zona waktu lokal browser.
 function toDateKey(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -65,17 +88,18 @@ function toDateKey(date) {
     return `${year}-${month}-${day}`;
 }
 
+// 1. STOK BARANG (menggunakan kolom stok, stok_minimum, aktif)
 async function loadStokBarang() {
     const container = document.getElementById("stock-alerts");
     if (!container) return;
 
     const { data, error } = await supabaseClient
         .from("barang")
-        .select("stok, aktif");
+        .select("stok, stok_minimum, aktif");
 
     if (error) {
         console.error("Gagal memuat ringkasan stok:", error);
-        showMessage("stock-alerts", "Ringkasan stok gagal dimuat.", "danger");
+        showMessage("stock-alerts", `Ringkasan stok gagal dimuat (${error.message}).`, "danger");
         return;
     }
 
@@ -89,9 +113,14 @@ async function loadStokBarang() {
     const jumlahHabis = barangAktif.filter(item => Number(item.stok) === 0).length;
     const jumlahMenipis = barangAktif.filter(item => {
         const stok = Number(item.stok) || 0;
-        return stok > 0 && stok <= 5;
+        const min = Number(item.stok_minimum ?? 5);
+        return stok > 0 && stok <= min;
     }).length;
-    const jumlahAman = barangAktif.filter(item => Number(item.stok) > 5).length;
+    const jumlahAman = barangAktif.filter(item => {
+        const stok = Number(item.stok) || 0;
+        const min = Number(item.stok_minimum ?? 5);
+        return stok > min;
+    }).length;
 
     const ringkasan = [
         { label: "Stok Inactive", jumlah: jumlahInactive, warna: "secondary", ikon: "fa-ban" },
@@ -101,22 +130,22 @@ async function loadStokBarang() {
     ];
 
     container.innerHTML = ringkasan.map(item => `
-        <div class="alert alert-${item.warna} d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded"
-             style="min-height: 56px;">
+        <a href="stok.html" class="alert alert-${item.warna} d-flex justify-content-between align-items-center border-0 mb-2 py-2 px-3 rounded text-decoration-none"
+             style="min-height: 54px;">
             <div class="d-flex align-items-center">
                 <i class="fas ${item.ikon} mr-2" aria-hidden="true"></i>
                 <span class="small font-weight-bold">${item.label}</span>
             </div>
             <span class="badge badge-${item.warna} badge-pill">${item.jumlah} produk</span>
-        </div>
+        </a>
     `).join("");
 }
 
+// 2. PENJUALAN HARIAN (tabel penjualan: tanggal, total, status)
 async function loadPenjualanHarian() {
     const container = document.getElementById("sales-chart");
     if (!container) return;
 
-    // Ambil tujuh hari kalender terakhir, termasuk hari ini, menurut waktu lokal.
     const today = new Date();
     const startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 6);
     const endExclusive = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
@@ -131,7 +160,7 @@ async function loadPenjualanHarian() {
 
     if (error) {
         console.error("Gagal memuat penjualan harian:", error);
-        showMessage("sales-chart", "Data penjualan gagal dimuat.", "danger");
+        showMessage("sales-chart", `Data penjualan gagal dimuat (${error.message}).`, "danger");
         return;
     }
 
@@ -160,33 +189,34 @@ async function loadPenjualanHarian() {
     container.innerHTML = dailyTotals.map(([key, total]) => {
         const [year, month, day] = key.split("-").map(Number);
         const labelDate = new Date(year, month - 1, day);
-        const barHeight = maxTotal > 0 ? Math.max((total / maxTotal) * 100, total > 0 ? 8 : 0) : 0;
+        const barHeight = maxTotal > 0 ? Math.max((total / maxTotal) * 75, total > 0 ? 8 : 0) : 0;
         const weekday = new Intl.DateTimeFormat("id-ID", { weekday: "short" }).format(labelDate);
 
         return `
             <div class="d-flex flex-column justify-content-end align-items-center text-center mx-1"
-                 style="flex: 1; min-width: 0; height: 100%;"
+                 style="flex: 1; min-width: 0; height: 185px;"
                  title="${escapeHtml(`${formatTanggal(labelDate)}: ${formatRupiah(total)}`)}">
                 <div class="small text-muted mb-1" style="font-size: 10px; white-space: nowrap;">${escapeHtml(formatRupiah(total))}</div>
-                <div class="bg-primary rounded-top w-100" style="height: ${barHeight}%; min-height: ${total > 0 ? 4 : 0}px;"></div>
+                <div class="bg-primary rounded-top w-100" style="height: ${barHeight}%; min-height: ${total > 0 ? 4 : 0}px; transition: height 0.3s ease;"></div>
                 <div class="small text-muted mt-2" style="font-size: 10px; white-space: nowrap;">${escapeHtml(weekday)}<br>${day}</div>
             </div>
         `;
     }).join("");
 }
 
+// 3. PRODUK TERLARIS (relasi detail_penjualan -> barang & penjualan)
 async function loadProdukTerlaris() {
     const target = document.getElementById("produk-terlaris");
     if (!target) return;
 
     const { data, error } = await supabaseClient
         .from("detail_penjualan")
-        .select("jumlah, barang(nama_barang), penjualan!inner(status)")
+        .select("jumlah, barang(kode_barang, nama_barang, satuan), penjualan!inner(status)")
         .eq("penjualan.status", "selesai");
 
     if (error) {
         console.error("Gagal memuat produk terlaris:", error);
-        showMessage("produk-terlaris", "Data produk terlaris gagal dimuat.", "danger");
+        showMessage("produk-terlaris", `Data produk terlaris gagal dimuat (${error.message}).`, "danger");
         return;
     }
 
@@ -194,71 +224,101 @@ async function loadProdukTerlaris() {
     (data || []).forEach(detail => {
         const product = getRelation(detail, "barang");
         if (!product?.nama_barang) return;
-        quantities.set(product.nama_barang, (quantities.get(product.nama_barang) || 0) + (Number(detail.jumlah) || 0));
+
+        const existing = quantities.get(product.nama_barang) || {
+            nama: product.nama_barang,
+            kode: product.kode_barang || "",
+            satuan: product.satuan || "pcs",
+            jumlah: 0
+        };
+        existing.jumlah += Number(detail.jumlah) || 0;
+        quantities.set(product.nama_barang, existing);
     });
 
-    const bestSellers = Array.from(quantities.entries())
-        .map(([nama, jumlah]) => ({ nama, jumlah }))
-        .sort((a, b) => b.jumlah - a.jumlah || a.nama.localeCompare(b.nama, "id"))
-        .slice(0, 6);
+    cachedProdukTerlaris = Array.from(quantities.values())
+        .sort((a, b) => b.jumlah - a.jumlah || a.nama.localeCompare(b.nama, "id"));
 
-    if (!bestSellers.length) {
+    renderProdukTerlaris(cachedProdukTerlaris);
+}
+
+function renderProdukTerlaris(items) {
+    const target = document.getElementById("produk-terlaris");
+    if (!target) return;
+
+    const topItems = items.slice(0, 6);
+    if (!topItems.length) {
         showMessage("produk-terlaris", "Belum ada data penjualan produk.");
         return;
     }
 
-    target.innerHTML = bestSellers.map((item, index) => `
+    target.innerHTML = topItems.map((item, index) => `
         <div class="col-12 col-md-6 mb-3">
             <div class="d-flex align-items-center">
                 <div class="bg-light rounded-circle mr-3 d-flex align-items-center justify-content-center text-primary font-weight-bold"
                      style="width: 42px; height: 42px; flex: 0 0 42px;">${index + 1}</div>
-                <div>
-                    <div class="small font-weight-bold text-dark">${escapeHtml(item.nama)}</div>
-                    <div class="small text-muted">${item.jumlah} terjual</div>
+                <div class="text-truncate">
+                    <div class="small font-weight-bold text-dark text-truncate">${escapeHtml(item.nama)}</div>
+                    <div class="small text-muted">${item.jumlah} ${escapeHtml(item.satuan)} terjual</div>
                 </div>
             </div>
         </div>
     `).join("");
 }
 
+// 4. REKAP BELANJA (menggunakan nomor_belanja sesuai tabel public.belanja)
 async function loadRekapBelanja() {
     const target = document.getElementById("rekap-belanja");
     if (!target) return;
 
-    // nomor_belanja tidak digunakan karena kolom tersebut tidak tersedia di tabel Supabase.
     const { data, error } = await supabaseClient
         .from("belanja")
-        .select("id, tanggal, nama_pemasok, total, status")
+        .select("id, nomor_belanja, tanggal, nama_pemasok, total, status")
         .order("tanggal", { ascending: false })
-        .limit(3);
+        .limit(5);
 
     if (error) {
         console.error("Gagal memuat rekap belanja:", error);
-        showMessage("rekap-belanja", "Data rekap belanja gagal dimuat.", "danger");
+        showMessage("rekap-belanja", `Data rekap belanja gagal dimuat (${error.message}).`, "danger");
         return;
     }
 
-    if (!data?.length) {
+    cachedRekapBelanja = data || [];
+    renderRekapBelanja(cachedRekapBelanja);
+}
+
+function renderRekapBelanja(items) {
+    const target = document.getElementById("rekap-belanja");
+    if (!target) return;
+
+    const topPurchases = items.slice(0, 3);
+    if (!topPurchases.length) {
         showMessage("rekap-belanja", "Belum ada data belanja.");
         return;
     }
 
-    target.innerHTML = data.map(purchase => `
-        <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
-            <div class="d-flex align-items-center mr-2">
-                <div class="rounded-circle bg-light mr-3 d-flex align-items-center justify-content-center text-primary"
-                     style="width: 36px; height: 36px; flex: 0 0 36px;">
-                    <i class="fas fa-receipt" aria-hidden="true"></i>
+    target.innerHTML = topPurchases.map(purchase => {
+        const kodeBelanja = purchase.nomor_belanja || `Belanja #${purchase.id}`;
+        const badgeStatus = purchase.status === "batal" ? "badge-danger" : "badge-success";
+
+        return `
+            <div class="list-group-item d-flex justify-content-between align-items-center border-0 px-0 py-2">
+                <div class="d-flex align-items-center mr-2 text-truncate">
+                    <div class="rounded-circle bg-light mr-3 d-flex align-items-center justify-content-center text-primary"
+                         style="width: 36px; height: 36px; flex: 0 0 36px;">
+                        <i class="fas fa-receipt" aria-hidden="true"></i>
+                    </div>
+                    <div class="text-truncate">
+                        <div class="small font-weight-bold text-dark text-truncate">${escapeHtml(kodeBelanja)}</div>
+                        <div class="text-muted text-truncate" style="font-size: 11px;">
+                            ${escapeHtml(purchase.nama_pemasok || "Pemasok umum")} · ${escapeHtml(formatTanggal(purchase.tanggal))}
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <div class="small font-weight-bold text-dark">Belanja #${escapeHtml(purchase.id)}</div>
-                    <div class="text-muted" style="font-size: 11px;">${escapeHtml(purchase.nama_pemasok || "Pemasok tidak dicantumkan")} · ${escapeHtml(formatTanggal(purchase.tanggal))}</div>
+                <div class="text-right">
+                    <div class="small font-weight-bold text-dark">${escapeHtml(formatRupiah(purchase.total))}</div>
+                    <span class="badge ${badgeStatus} font-weight-normal">${escapeHtml(purchase.status || "selesai")}</span>
                 </div>
             </div>
-            <div class="text-right">
-                <div class="small font-weight-bold text-dark">${escapeHtml(formatRupiah(purchase.total))}</div>
-                <div class="text-muted small">${escapeHtml(purchase.status || "")}</div>
-            </div>
-        </div>
-    `).join("");
+        `;
+    }).join("");
 }
