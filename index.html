@@ -1,206 +1,103 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dashboard - Teras Putro Mapan</title>
-    <!-- Bootstrap 4.6.2 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" />
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap" />
-    <link rel="stylesheet" href="sidebar.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Konfigurasi -->
-    <script src="config.js"></script>
-    <!-- Aplikasi -->
-    <script src="app.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log in</title>
+  <link rel="stylesheet" href="asset/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-light">
+<body class="auth-page">
 
-    <header style="background-color: #007bff; z-index: 1030; height: 90px;"
-            class="fw-semibold fixed-top d-flex align-items-center px-3 shadow-sm">
-        <button id="menu-btn" type="button" class="btn btn-link text-white p-0 mr-3 d-lg-none" aria-label="Buka menu">
-            <i class="fas fa-bars fa-lg"></i>
-        </button>
-        <a href="index.html" class="d-flex align-items-center position-relative text-decoration-none">
-            <img src="tpmfinal1.webp" alt="Logo Teras Putro Mapan" style="height: 75px; margin-right: 12px;">
-            <div style="line-height: 1.2;">
-                <div class="header-title" style="font-family: 'Oswald', sans-serif; color:white; font-weight: bold; font-size: 1.25rem;">
-                    TERAS PUTRO MAPAN
-                </div>
-                <div class="header-subtitle" style="font-family: 'Gill Sans', sans-serif; color: white; font-size: 0.85rem;">
-                    Sekebrok RT 01/08, Kel. Beji, Kec. Ungaran Timur, Kab. Semarang
-                </div>
-            </div>
-        </a>
-    </header>
-
-    <!-- Overlay (klik untuk menutup sidebar di HP) -->
-    <div id="sidebar-overlay"></div>
-
-    <!-- Main Wrapper -->
-    <div class="d-flex" id="wrapper">
-        <!-- Sidebar Navigation -->
-        <div class="bg-white border-right" id="sidebar-wrapper">
-            <div class="list-group list-group-flush py-2">
-                <div class="px-3 py-2 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
-                    Admin
-                </div>
-                <a href="index.html" class="list-group-item list-group-item-action border-0 active rounded-right my-1">
-                    <i class="fas fa-th-large mr-3"></i> Dashboard
-                </a>
-                <a href="stok.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-cubes mr-3"></i> Stok Barang
-                </a>
-                <a href="penjualan.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-chart-line mr-3"></i> Penjualan Harian
-                </a>
-                <a href="terlaris.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-fire mr-3"></i> Produk Terlaris
-                </a>
-                <a href="belanja.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-receipt mr-3"></i> Rekap Belanja
-                </a>
-
-                <div class="px-3 py-2 text-uppercase font-weight-bold text-muted small" style="letter-spacing: 0.5px;">
-                    Operasional
-                </div>
-                <a href="kasir.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-cash-register mr-3"></i> Kasir
-                </a>
-                <a href="tagihan.html" class="list-group-item list-group-item-action border-0 my-1 text-secondary">
-                    <i class="fas fa-globe mr-3"></i> Tagihan
-                </a>
-            </div>
-        </div>
-
-        <!-- Page Content -->
-        <div id="page-content-wrapper">
-            <div class="container-fluid p-3 p-md-4">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
-                    <h4 class="font-weight-bold text-dark mb-2 mb-md-0" style="font-family: 'Oswald', sans-serif;">Dashboard</h4>
-                    <div class="input-group input-group-sm bg-white rounded-pill border px-2 py-1" style="max-width: 360px;">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text bg-transparent border-0 text-muted">
-                                <i class="fas fa-search"></i>
-                            </span>
-                        </div>
-                        <input id="dashboard-search" type="text" class="form-control bg-transparent border-0 shadow-none" placeholder="Cari produk atau pemasok..." aria-label="Cari">
-                    </div>
-                </div>
-
-                <div class="row mb-4">
-                    <div class="col-lg-5 mb-3 mb-lg-0">
-                        <div class="card border-0 shadow-sm h-100 rounded-lg">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="font-weight-bold m-0 text-dark">Stok Barang</h6>
-                                    <a href="stok.html" class="text-primary small font-weight-bold">Lihat Semua</a>
-                                </div>
-
-                                <div id="stock-alerts" aria-live="polite">
-                                    <div class="text-muted small">Memuat data stok...</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-lg-7">
-                        <div class="card border-0 shadow-sm h-100 rounded-lg">
-                            <div class="card-body d-flex flex-column">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="font-weight-bold m-0 text-dark">Penjualan Harian</h6>
-                                    <a href="penjualan.html" class="text-primary small font-weight-bold">Lihat Semua</a>
-                                </div>
-                                <!-- Grafik total penjualan tujuh hari terakhir -->
-                                <div id="sales-chart" class="flex-grow-1 w-100 d-flex align-items-end justify-content-around bg-light rounded p-3" style="min-height: 220px;" aria-live="polite">
-                                    <span class="text-muted small">Memuat data penjualan...</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <!-- Kiri: Produk Terlaris -->
-                    <div class="col-lg-6 mb-3 mb-lg-0">
-                        <div class="card border-0 shadow-sm h-100 rounded-lg">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="font-weight-bold m-0 text-dark">Produk Terlaris</h6>
-                                    <a href="terlaris.html" class="text-primary small font-weight-bold">Lihat Semua</a>
-                                </div>
-
-                                <div id="produk-terlaris" class="row" aria-live="polite">
-                                    <div class="col-12 text-muted small">Memuat data produk...</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Kanan: Rekap Belanja -->
-                    <div class="col-lg-6">
-                        <div class="card border-0 shadow-sm h-100 rounded-lg">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-center mb-3">
-                                    <h6 class="font-weight-bold m-0 text-dark">Rekap Belanja</h6>
-                                    <a href="belanja.html" class="text-primary small font-weight-bold">Lihat Semua</a>
-                                </div>
-
-                                <div id="rekap-belanja" class="list-group list-group-flush border-0" aria-live="polite">
-                                    <div class="text-muted small py-2">Memuat data belanja...</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <div class="auth-card">
+    <div class="auth-logo-wrapper">
+      <img src="asset/img/tpmfinal1.webp" alt="Logo Teras Putro Mapan">
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        (function () {
-            var $body = $("body");
-            var BREAKPOINT = 992;
+    <h1 class="auth-title">Log in</h1>
 
-            function isMobile() {
-                return window.innerWidth < BREAKPOINT;
-            }
+    <div id="alertBox" class="auth-alert"></div>
 
-            function toggleSidebar() {
-                if (isMobile()) {
-                    $body.toggleClass("sidebar-open");
-                } else {
-                    $body.toggleClass("sidebar-collapsed");
-                }
-            }
+    <form id="loginForm">
+      <div class="auth-form-group">
+        <label for="email">Email :</label>
+        <input type="email" id="email" name="email" placeholder="nama@email.com" required autocomplete="email">
+      </div>
 
-            function closeMobileSidebar() {
-                $body.removeClass("sidebar-open");
-            }
+      <div class="auth-form-group">
+        <label for="password">Password :</label>
+        <input type="password" id="password" name="password" placeholder="Password" required autocomplete="current-password">
+      </div>
 
-            $("#menu-btn, #menu-toggle").on("click", function (e) {
-                e.preventDefault();
-                toggleSidebar();
-            });
+      <button type="submit" id="loginBtn" class="auth-btn">Log in</button>
+    </form>
 
-            $("#sidebar-overlay").on("click", closeMobileSidebar);
+    <div class="auth-footer-link">
+      Belum punya akun? <a href="register.html">Register</a>
+    </div>
+  </div>
 
-            $("#sidebar-wrapper a").on("click", function () {
-                if (isMobile()) closeMobileSidebar();
-            });
+  <script>
+    const SUPABASE_URL = 'https://pxtuvkpyyzujzeiywour.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_47_TljLIRHGE4jgMfdObVg_l47vt2wH';
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            $(document).on("keydown", function (e) {
-                if (e.key === "Escape") closeMobileSidebar();
-            });
+    const loginForm = document.getElementById('loginForm');
+    const loginBtn = document.getElementById('loginBtn');
+    const alertBox = document.getElementById('alertBox');
 
-            $(window).on("resize", function () {
-                if (!isMobile()) closeMobileSidebar();
-            });
-        })();
-    </script>
+    function showAlert(message, type = 'error') {
+      alertBox.textContent = message;
+      alertBox.className = `auth-alert ${type}`;
+      alertBox.style.display = 'block';
+    }
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.style.display = 'none';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = 'Memproses...';
+
+      try {
+        // 1. Login dengan Email & Password ke Supabase Auth
+        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+
+        if (authError) {
+          throw new Error('Email atau password salah, atau email belum diverifikasi.');
+        }
+
+        // 2. Ambil Role dari tabel public.profiles
+        const { data: profileData, error: profileError } = await supabaseClient
+          .from('profiles')
+          .select('role')
+          .eq('id', authData.user.id)
+          .single();
+
+        if (profileError || !profileData) {
+          throw new Error('Profil pengguna tidak ditemukan.');
+        }
+
+        // 3. Redirect sesuai Role
+        if (profileData.role === 'admin') {
+          window.location.href = 'admin-dashboard.html';
+        } else {
+          window.location.href = 'order-menu.html';
+        }
+
+      } catch (err) {
+        showAlert(err.message, 'error');
+        loginBtn.disabled = false;
+        loginBtn.textContent = 'Log in';
+      }
+    });
+  </script>
+
 </body>
 </html>
